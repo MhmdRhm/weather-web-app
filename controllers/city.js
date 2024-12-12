@@ -122,7 +122,11 @@ function unsaveCityHandler(req, res) {
             user.savedCities = user.savedCities.filter(c => c !== city._id.toString());
             return user.save();
         })
-        .then(() => res.redirect("/"))
+        .then(() => {
+            if (req.headers.referer.split("/")[req.headers.referer.split("/").length - 1] === "saved")
+                return res.redirect("/saved");
+            res.redirect("/");
+        })
         .catch(er => res.send("Interval server error."));
 }
 
