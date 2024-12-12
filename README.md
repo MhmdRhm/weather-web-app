@@ -5,7 +5,7 @@ In order to install and set things up you'll need to have:
 and optionally
 3. Mongodb Compass
 
-## Instalation
+## Installation
 1. git clone https://github.com/mhmdrhm/weather-web-app.git
 2. cd weather-web-app
 3. npm install (to install all project's dependencies)
