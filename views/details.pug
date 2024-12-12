@@ -1,0 +1,17 @@
+extends default 
+
+block content 
+    .container(style="display:flex; height: 100vh;")
+        div.city(style="border:1px solid black; padding: 20px 30px; margin: auto;")
+            h1(align="center")=name
+            h3(style="text-align:center;")=description
+            h4 دما &larr; #{temp}
+            h4 رطوبت &larr; #{humidity}
+            h4 سرعت وزش باد &larr; #{windSpeed}
+
+            hr(color="black")
+
+            h2 پیش بینی دمای امروز #{name}
+            h4 صبح &larr; #{morningTemp}
+            h4 غروب &larr; #{eveningTemp}
+            h4 شب &larr; #{nightTemp}

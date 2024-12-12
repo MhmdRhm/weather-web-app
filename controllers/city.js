@@ -1,0 +1,129 @@
+const City = require("../models/City");
+const Weather = require("../models/Weather");
+const Forecast = require("../models/Forecast");
+const User = require("../models/User");
+
+function getCities() {
+    const rawCities = fs.readFileSync("cities.json", "utf-8");
+    const jsonData = JSON.parse(rawCities);
+    return jsonData;
+}
+
+async function getCityWeatherDetails(req, res) {
+    const cityName = req.params.name;
+    const city = await City.findOne({ name: cityName });
+    if (!city) {
+        return res.render("404");
+    }
+
+    const weather = await Weather.findOne({ city: city._id });
+
+    const forecast = await Forecast.findOne({ city: city._id });
+
+    res.render("details", { title: `آب و هوای ${city.name}`, ...weather._doc, name: city.name, ...forecast._doc });
+};
+
+async function getAllCitiesWeather(req, res) {
+    // setInterval(() => console.log("HERE"), 2000);
+    /* const result = await City.find();
+    if (result.length < 1) {
+        const cities_name = getCities();
+        const fetchCities = cities_name.map(name => {
+            return fetch(`https://one-api.ir/weather/?token=574940:6536be411e121&action=current&city=${name}`)
+                .then(res => res.json()).then(c => { c.result.name = name; return c; });
+        });
+        const cities = await Promise.all(fetchCities);
+        const saveCities = cities.map(city => {
+            city = city.result;
+            return new City({ name: city.name, temp: city.main.temp, humidity: city.main.humidity, description: city.weather[0].description, windSpeed: city.wind.speed }).save();
+        });
+        await Promise.all(saveCities);
+    } */
+
+    const weathers = await Weather.find().populate('city');
+    weathers.forEach(weather => {
+        weather.name = weather.city.name;
+        weather._id = weather.city._id.toString();
+    });
+
+    if (!req.session.user)
+        return res.render("home", { title: "آب و هوای فعلی شهرهای کشور", cities: weathers });
+    else {
+        const user = await User.findOne({ username: req.session.user.username });
+        if (user) {
+            return res.render("home", { title: "آب و هوای فعلی شهرهای کشور", cities: weathers, savedCities: user.savedCities });
+        }
+    }
+}
+
+async function getSavedCities(req, res) {
+    if (!req.session?.user)
+        return res.redirect("/login");
+
+    const user = await User.findOne({ username: req.session.user.username });
+    const cities = await Weather.find({ city: user.savedCities }).populate('city');
+    if (cities.length < 1)
+        return res.render("savedCities", { title: "شهرهای ذخیره شده", cities: [] });
+
+    cities.forEach(c => {
+        c.name = c.city.name;
+    });
+
+    res.render("savedCities", { title: "شهرهای ذخیره شده", cities });
+}
+
+function saveCityHandler(req, res) {
+    if (req.session?.user) {
+        let user;
+        User.findOne({ username: req.session?.user?.username })
+            .then(fetchedUser => {
+                user = fetchedUser;
+                if (user) {
+                    return City.findOne({ name: req.params.city });
+                } else {
+                    throw new Error("Something went wrong! User not found.");
+                }
+            })
+            .then(city => {
+                if (city) {
+                    if (user.savedCities.find(c => c === city._id.toString())) {
+                        throw new Error("Already saved city");
+                    } else {
+                        user.savedCities.push(city._id);
+                        return user.save();
+                    }
+
+                } else {
+                    throw new Error("Something went wrong! City not found.");
+                }
+            })
+            .then(() => res.redirect("/"))
+            .catch(er => res.send(er.message));
+    } else {
+        res.redirect("/login");
+    }
+}
+
+function unsaveCityHandler(req, res) {
+    const cityName = req.params?.city;
+    if (!cityName)
+        return res.redirect("/");
+
+    if (!req.session?.user)
+        return res.redirect("/login");
+
+    let user;
+    User.findOne({ username: req.session.user.username })
+        .then(fetchedUser => {
+            user = fetchedUser;
+            return City.findOne({ name: cityName });
+        })
+        .then(city => {
+            user.savedCities = user.savedCities.filter(c => c !== city._id.toString());
+            return user.save();
+        })
+        .then(() => res.redirect("/"))
+        .catch(er => res.send("Interval server error."));
+}
+
+module.exports = { getCityWeatherDetails, getAllCitiesWeather, getSavedCities, saveCityHandler, unsaveCityHandler };
