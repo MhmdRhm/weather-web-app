@@ -4,3 +4,15 @@ body {
     display: flex;
     flex-direction: column;
 }
+
+.container {
+    margin-top: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#updateCityForm {
+    width: 40%;
+}

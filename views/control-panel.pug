@@ -1,9 +1,21 @@
 extends default 
 block content 
-    table
-        thead 
-            th شهر
-            th عملیات
-        tbody
-            td تهران
-            td ویرایش
+    .cpanel-container 
+        if cities.length >= 1
+            table
+                thead 
+                    tr 
+                        th شهر
+                        th عملیات
+                tbody
+                    for city in cities 
+                        tr 
+                            td=city.name
+                            td 
+                                a.removeLink(href=`/cpanel/delete-city/${city.name}`) حذف 
+                                a.updateLink(href=`/cpanel/update-city/${city.name}`) ویرایش
+        
+        .shouldUpdateContainer
+            input#shouldUpdateChk(type="checkbox", name="shouldUpdate", checked=shouldUpdate)
+            label(for="shouldUpdate") آپدیت شهرها به صورت خودکار (هر 10 دقیقه یکبار)
+

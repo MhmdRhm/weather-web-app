@@ -3,11 +3,6 @@ const Weather = require("../models/Weather");
 const Forecast = require("../models/Forecast");
 const User = require("../models/User");
 
-function getCities() {
-    const rawCities = fs.readFileSync("cities.json", "utf-8");
-    const jsonData = JSON.parse(rawCities);
-    return jsonData;
-}
 
 async function getCityWeatherDetails(req, res) {
     const cityName = req.params.name;
@@ -24,22 +19,6 @@ async function getCityWeatherDetails(req, res) {
 };
 
 async function getAllCitiesWeather(req, res) {
-    // setInterval(() => console.log("HERE"), 2000);
-    /* const result = await City.find();
-    if (result.length < 1) {
-        const cities_name = getCities();
-        const fetchCities = cities_name.map(name => {
-            return fetch(`https://one-api.ir/weather/?token=574940:6536be411e121&action=current&city=${name}`)
-                .then(res => res.json()).then(c => { c.result.name = name; return c; });
-        });
-        const cities = await Promise.all(fetchCities);
-        const saveCities = cities.map(city => {
-            city = city.result;
-            return new City({ name: city.name, temp: city.main.temp, humidity: city.main.humidity, description: city.weather[0].description, windSpeed: city.wind.speed }).save();
-        });
-        await Promise.all(saveCities);
-    } */
-
     const weathers = await Weather.find().populate('city');
     weathers.forEach(weather => {
         weather.name = weather.city.name;
