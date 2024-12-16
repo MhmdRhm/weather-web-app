@@ -1,7 +1,7 @@
 ## Prerequisites 
 In order to install and set things up you'll need to have:
-1. Mongodb Daemon
-3. Mongodb Compass(optional)
+1. [Mongodb Daemon](https://www.mongodb.com/try/download/community)
+3. [Mongodb Compass(optional)](https://www.mongodb.com/try/download/compass)
 
 ## Installation
 1. git clone https://github.com/mhmdrhm/weather-web-app.git
