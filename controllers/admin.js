@@ -129,5 +129,12 @@ async function updateCityHandler(req, res) {
     res.redirect("/");
 }
 
+async function getWeatherData(req, res) {
+    enableUpdateWeather();
+    await updateWeather();
+    disableUpdateWeather();
+    res.redirect("/");
+}
 
-module.exports = { getAdminPanel, updateWeather, automaticUpdateHandler, deleteCityHandler, getUpdateCity, updateCityHandler }; 
+
+module.exports = { getAdminPanel, updateWeather, automaticUpdateHandler, deleteCityHandler, getUpdateCity, updateCityHandler, getWeatherData }; 

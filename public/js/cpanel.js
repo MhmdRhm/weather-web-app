@@ -1,7 +1,6 @@
 if (window.location.pathname === "/cpanel") {
     const shouldUpdateChk = document.getElementById("shouldUpdateChk");
     const updateLinks = document.querySelectorAll(".updateLink");
-    console.log(updateLinks);
 
     shouldUpdateChk.onchange = (event) => {
         if (event.target.checked) {

@@ -15,7 +15,7 @@ async function getCityWeatherDetails(req, res) {
 
     const forecast = await Forecast.findOne({ city: city._id });
 
-    res.render("details", { title: `آب و هوای ${city.name}`, ...weather._doc, name: city.name, ...forecast._doc });
+    res.render("details", { title: `آب و هوای ${city.name}`, ...weather._doc, name: city.name, ...forecast._doc, id: city._id.toString() });
 };
 
 async function getAllCitiesWeather(req, res) {
@@ -54,7 +54,7 @@ async function getSavedCities(req, res) {
 function saveCityHandler(req, res) {
     if (req.session?.user) {
         let user;
-        User.findOne({ username: req.session?.user?.username })
+        User.findOne({ username: req.session.user?.username })
             .then(fetchedUser => {
                 user = fetchedUser;
                 if (user) {
@@ -69,6 +69,7 @@ function saveCityHandler(req, res) {
                         throw new Error("Already saved city");
                     } else {
                         user.savedCities.push(city._id);
+                        req.session.user.savedCities.push(city._id);
                         return user.save();
                     }
 
@@ -76,7 +77,14 @@ function saveCityHandler(req, res) {
                     throw new Error("Something went wrong! City not found.");
                 }
             })
-            .then(() => res.redirect("/"))
+            .then(() => {
+                const reqSourceUrl = req.headers.referer.split("/");
+                if (reqSourceUrl.length === 4) {
+                    res.redirect("/saved");
+                } else {
+                    res.redirect(`/city/${reqSourceUrl[reqSourceUrl.length - 1]}`);
+                }
+            })
             .catch(er => res.send(er.message));
     } else {
         res.redirect("/login");
@@ -99,11 +107,15 @@ function unsaveCityHandler(req, res) {
         })
         .then(city => {
             user.savedCities = user.savedCities.filter(c => c !== city._id.toString());
+            req.session.user.savedCities = req.session.user.savedCities.filter(c => c !== city._id.toString());
             return user.save();
         })
         .then(() => {
-            if (req.headers.referer.split("/")[req.headers.referer.split("/").length - 1] === "saved")
+            const reqSourceUrl = req.headers.referer.split("/");
+            if (reqSourceUrl[req.headers.referer.split("/").length - 1] === "saved")
                 return res.redirect("/saved");
+            else if (reqSourceUrl[3] === "city")
+                return res.redirect(`/city/${reqSourceUrl[reqSourceUrl.length - 1]}`);
             res.redirect("/");
         })
         .catch(er => res.send("Interval server error."));

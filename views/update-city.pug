@@ -1,7 +1,7 @@
 extends default 
 block content 
     .container
-        form#updateCityForm(method="POST", target=`/cpanel/update-city/${city.name}`)
+        form#updateCityForm(method="POST", action=`/cpanel/update-city/${city.name}`)
             div(style="display: flex;")
                 label(for="name", style="flex: 1") شهر: 
                 input(type="text", name="name",  style="flex: 5", disabled, value=city.name) 

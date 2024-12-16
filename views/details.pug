@@ -3,6 +3,13 @@ extends default
 block content 
     .container(style="display:flex; height: 100vh;")
         div.city(style="border:1px solid black; padding: 20px 30px; margin: auto;")
+            if user
+                if user.savedCities.includes(id)
+                    a(style="position: absolute;background:none;cursor:pointer; text-decoration: none", href=`/unsave/${name}`)
+                        span 🖤
+                else
+                    a(style="position: absolute;background:none;cursor:pointer; text-decoration: none", href=`/save/${name}`)
+                        span 🤍
             h1(align="center")=name
             h3(style="text-align:center;")=description
             h4 

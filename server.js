@@ -4,7 +4,7 @@ const { getAllCitiesWeather, getCityWeatherDetails, getSavedCities, saveCityHand
 const { getAllCitiesForecast } = require("./controllers/forecast");
 const notFoundHandler = require("./controllers/404");
 const { getLogin, loginHandler, logoutHandler, getRegister, registerHandler } = require("./controllers/auth");
-const { getAdminPanel, updateWeather, automaticUpdateHandler, deleteCityHandler, getUpdateCity, updateCityHandler } = require("./controllers/admin");
+const { getAdminPanel, updateWeather, automaticUpdateHandler, deleteCityHandler, getUpdateCity, updateCityHandler, getWeatherData } = require("./controllers/admin");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 
@@ -48,6 +48,7 @@ app.post("/automaticUpdate", automaticUpdateHandler);
 app.get("/cpanel/delete-city/:city", deleteCityHandler);
 app.get("/cpanel/update-city/:city", getUpdateCity);
 app.post("/cpanel/update-city/:city", updateCityHandler);
+app.get("/cpanel/get-weather-data", getWeatherData);
 
 app.get("*", notFoundHandler);
 
