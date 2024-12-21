@@ -1,8 +1,8 @@
-const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 
 function isAuthenticated(req) {
-    if (!req.session?.user)
+    if (!req.session.user)
         return false;
     return true;
 }
@@ -34,13 +34,12 @@ async function loginHandler(req, res) {
         res.redirect("/");
     }
     else {
-        // Wrong password
         res.render("login", { message: "! کاربری یافت نشد !", title: "ورود کاربر" });
     }
 }
 
 function logoutHandler(req, res) {
-    if (req.session?.user) {
+    if (req.session.user) {
         req.session.destroy(er => {
             if (!er) {
                 return res.redirect("/login");

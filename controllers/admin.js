@@ -4,15 +4,6 @@ const Forecast = require("../models/Forecast");
 const Weather = require("../models/Weather");
 const User = require("../models/User");
 
-async function getAdminPanel(req, res) {
-    if (!req.session?.user?.isAdmin) {
-        return res.redirect("/");
-    }
-
-    const cities = await City.find();
-    res.render("control-panel", { title: "پنل مدیریت", shouldUpdate: enabled, cities });
-}
-
 function getCities() {
     const rawCities = fs.readFileSync("cities.json", "utf-8");
     const jsonData = JSON.parse(rawCities);
@@ -44,12 +35,12 @@ async function updateWeather() {
 
     for (const w of weathers) {
         const found = await City.findOne({ name: w.name });
-        if (found == null) {
+        if (!found) {
             const city = await new City({ name: w.name }).save();
             await new Weather({ city: city._id, temp: w.temp, humidity: w.humidity, windSpeed: w.windSpeed, description: w.description }).save();
             await new Forecast({ city: city._id, morningTemp: w.morningTemp, eveningTemp: w.eveningTemp, nightTemp: w.nightTemp }).save();
         } else {
-            await Weather.findOneAndUpdate({ city: found._id }, {
+            await Weather.updateOne({ city: found._id }, {
                 $set: {
                     temp: w.temp,
                     humidity: w.humidity,
@@ -57,7 +48,7 @@ async function updateWeather() {
                     description: w.description
                 }
             });
-            await Forecast.findOneAndUpdate({ city: found._id }, {
+            await Forecast.updateOne({ city: found._id }, {
                 $set: {
                     monringTemp: w.morningTemp,
                     eveningTemp: w.eveningTemp,
@@ -66,13 +57,13 @@ async function updateWeather() {
             });
         }
     }
-    console.log("here");
+    console.log("UPDATED");
 }
 
 const disableUpdateWeather = () => enabled = false;
 const enableUpdateWeather = () => enabled = true;
 function automaticUpdateHandler(req, res) {
-    const shouldUpdate = req.body.shouldUpdate;
+    const shouldUpdate = req.body?.shouldUpdate;
     if (shouldUpdate)
         enableUpdateWeather();
     else
@@ -80,8 +71,18 @@ function automaticUpdateHandler(req, res) {
     res.status(200).json({ status: "success" });
 }
 
+async function getAdminPanel(req, res) {
+    if (!req.session.user?.isAdmin) {
+        return res.redirect("/");
+    }
+
+    const cities = await City.find();
+    res.render("control-panel", { title: "پنل مدیریت", shouldUpdate: enabled, cities, cpanel: true });
+}
+
+
 async function deleteCityHandler(req, res) {
-    if (req.session?.user && req.session.user.isAdmin) {
+    if (req.session.user?.isAdmin) {
         const name = req.params.city;
         const city = await City.findOne({ name });
         if (!city)
@@ -89,7 +90,7 @@ async function deleteCityHandler(req, res) {
         await City.deleteOne({ name });
         await Weather.deleteOne({ city: city._id })
         await Forecast.deleteOne({ city: city._id });
-        await User.updateOne({ username: req.session.user.username }, { $pull: { savedCities: city._id } });
+        await User.updateMany({}, { $pull: { savedCities: city._id } });
         res.redirect("/cpanel");
     } else {
         res.redirect("/");
@@ -97,7 +98,7 @@ async function deleteCityHandler(req, res) {
 }
 
 async function getUpdateCity(req, res) {
-    if (req.session?.user && req.session.user.isAdmin) {
+    if (req.session.user?.isAdmin) {
         const name = req.params.city;
         const city = await City.findOne({ name });
         if (!city)
@@ -111,17 +112,15 @@ async function getUpdateCity(req, res) {
 }
 
 async function updateCityHandler(req, res) {
-
     if (!req.session.user?.isAdmin)
         return res.redirect("/");
-
 
     const { temp, humidity, windSpeed, description } = req.body;
     const { city: name } = req.params;
     const city = await City.findOne({ name });
     if (!city)
         return res.redirect("/cpanel");
-    const result = await Weather.updateOne({ city: city._id }, {
+    await Weather.updateOne({ city: city._id }, {
         $set: {
             temp, humidity, windSpeed, description
         }
@@ -137,4 +136,12 @@ async function getWeatherData(req, res) {
 }
 
 
-module.exports = { getAdminPanel, updateWeather, automaticUpdateHandler, deleteCityHandler, getUpdateCity, updateCityHandler, getWeatherData }; 
+module.exports = {
+    getAdminPanel,
+    updateWeather,
+    automaticUpdateHandler,
+    deleteCityHandler,
+    getUpdateCity,
+    updateCityHandler,
+    getWeatherData
+}; 

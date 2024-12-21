@@ -1,12 +1,8 @@
 const Forecast = require("../models/Forecast");
 
-async function getAllCitiesForecast(req, res) {
-    const forecasts = [];
-    const response = await Forecast.find().populate("city");
-    response.forEach(forecast => {
-        forecast._doc.name = forecast._doc.city.name;
-        forecasts.push(forecast._doc);
-    });
+async function getAllCitiesForecast(_, res) {
+    let forecasts = await Forecast.find().populate("city");
+    forecasts = forecasts.map(f => ({ ...f._doc, name: f.city.name }));
     res.render("forecasts", { title: "پیش بینی آب و هوای امروز شهرها", forecasts });
 }
 

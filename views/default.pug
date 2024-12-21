@@ -10,7 +10,8 @@ html
         link(rel="stylesheet", href="/styles/details.css")
         link(rel="stylesheet", href="/styles/navbar.css")
         link(rel="stylesheet", href="/styles/control-panel.css")
-        script(src="/js/cpanel.js", defer)
+        if cpanel
+            script(src="/js/cpanel.js", defer)
         style.
             .navbar {
                 display: flex;

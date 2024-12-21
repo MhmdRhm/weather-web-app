@@ -5,17 +5,23 @@ const User = require("../models/User");
 
 
 async function getCityWeatherDetails(req, res) {
-    const cityName = req.params.name;
-    const city = await City.findOne({ name: cityName });
+    const name = req.params.city;
+    const city = await City.findOne({ name });
     if (!city) {
         return res.render("404");
     }
 
     const weather = await Weather.findOne({ city: city._id });
-
     const forecast = await Forecast.findOne({ city: city._id });
-
-    res.render("details", { title: `آب و هوای ${city.name}`, ...weather._doc, name: city.name, ...forecast._doc, id: city._id.toString() });
+    res.render(
+        "details",
+        {
+            title: `آب و هوای ${city.name}`,
+            ...weather._doc,
+            ...forecast._doc,
+            name: city.name,
+            id: city._id.toString()
+        });
 };
 
 async function getAllCitiesWeather(req, res) {
@@ -29,14 +35,18 @@ async function getAllCitiesWeather(req, res) {
         return res.render("home", { title: "آب و هوای فعلی شهرهای کشور", cities: weathers });
     else {
         const user = await User.findOne({ username: req.session.user.username });
-        if (user) {
-            return res.render("home", { title: "آب و هوای فعلی شهرهای کشور", cities: weathers, savedCities: user.savedCities });
-        }
+        res.render(
+            "home",
+            {
+                title: "آب و هوای فعلی شهرهای کشور",
+                cities: weathers,
+                savedCities: user.savedCities
+            });
     }
 }
 
 async function getSavedCities(req, res) {
-    if (!req.session?.user)
+    if (!req.session.user)
         return res.redirect("/login");
 
     const user = await User.findOne({ username: req.session.user.username });
@@ -52,9 +62,9 @@ async function getSavedCities(req, res) {
 }
 
 function saveCityHandler(req, res) {
-    if (req.session?.user) {
+    if (req.session.user) {
         let user;
-        User.findOne({ username: req.session.user?.username })
+        User.findOne({ username: req.session.user.username })
             .then(fetchedUser => {
                 user = fetchedUser;
                 if (user) {
@@ -68,7 +78,7 @@ function saveCityHandler(req, res) {
                     if (user.savedCities.find(c => c === city._id.toString())) {
                         throw new Error("Already saved city");
                     } else {
-                        user.savedCities.push(city._id);
+                        user.savedCities.push(city._id.toString());
                         req.session.user.savedCities.push(city._id);
                         return user.save();
                     }
@@ -79,6 +89,7 @@ function saveCityHandler(req, res) {
             })
             .then(() => {
                 const reqSourceUrl = req.headers.referer.split("/");
+                console.log(reqSourceUrl);
                 if (reqSourceUrl.length === 4) {
                     res.redirect("/saved");
                 } else {
@@ -92,18 +103,15 @@ function saveCityHandler(req, res) {
 }
 
 function unsaveCityHandler(req, res) {
-    const cityName = req.params?.city;
-    if (!cityName)
-        return res.redirect("/");
-
-    if (!req.session?.user)
+    if (!req.session.user)
         return res.redirect("/login");
 
+    const name = req.params.city;
     let user;
     User.findOne({ username: req.session.user.username })
         .then(fetchedUser => {
             user = fetchedUser;
-            return City.findOne({ name: cityName });
+            return City.findOne({ name });
         })
         .then(city => {
             user.savedCities = user.savedCities.filter(c => c !== city._id.toString());
@@ -112,7 +120,7 @@ function unsaveCityHandler(req, res) {
         })
         .then(() => {
             const reqSourceUrl = req.headers.referer.split("/");
-            if (reqSourceUrl[req.headers.referer.split("/").length - 1] === "saved")
+            if (reqSourceUrl[reqSourceUrl.length - 1] === "saved")
                 return res.redirect("/saved");
             else if (reqSourceUrl[3] === "city")
                 return res.redirect(`/city/${reqSourceUrl[reqSourceUrl.length - 1]}`);
@@ -121,4 +129,10 @@ function unsaveCityHandler(req, res) {
         .catch(er => res.send("Interval server error."));
 }
 
-module.exports = { getCityWeatherDetails, getAllCitiesWeather, getSavedCities, saveCityHandler, unsaveCityHandler };
+module.exports = {
+    getCityWeatherDetails,
+    getAllCitiesWeather,
+    getSavedCities,
+    saveCityHandler,
+    unsaveCityHandler
+};
