@@ -1,0 +1,62 @@
+doctype html 
+html 
+    head 
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+        meta(http-equiv='X-UA-Compatible' content='ie=edge')
+        title=title
+        link(rel="stylesheet", href="/styles/main.css")
+        link(rel="stylesheet", href="/styles/login.css")
+        link(rel="stylesheet", href="/styles/details.css")
+        link(rel="stylesheet", href="/styles/navbar.css")
+        link(rel="stylesheet", href="/styles/control-panel.css")
+        if cpanel
+            script(src="/js/cpanel.js", defer)
+        style.
+            .navbar {
+                display: flex;
+                border: 1px solid black;
+            }
+            .navbar div {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px;
+            }
+            .navbar div {
+                border-right: 1px solid black;
+                flex: 2;
+            }
+            .navbar div:first-child {
+                border-right: 0;
+                flex: 1;
+            }
+            .navbar div a {
+                text-decoration: none;
+                color: black;
+            }
+            .navbar div a {
+                font-size: 20px;
+            }
+        
+    body(dir="rtl") 
+        .navbar 
+            if !user
+                div 
+                    a(href="/login") ورود
+            else 
+                div
+                    a(href="/logout") خروج
+            if user && user.isAdmin 
+                div 
+                    a(href="/cpanel") ★ پنل مدیریت ★
+            if user
+                div    
+                    a(href="/saved") &#x2764; شهرهای ذخیره شده &#x2764;
+            div
+                a(href="/") آب و هوای فعلی شهرها
+            div 
+                a(href="/forecasts") پیش بینی دمای امروز شهرها
+            
+        block content

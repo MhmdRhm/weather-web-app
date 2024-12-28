@@ -1,0 +1,24 @@
+extends default 
+block content 
+    .cpanel-container 
+        if cities.length >= 1
+            table
+                thead 
+                    tr 
+                        th شهر
+                        th عملیات
+                tbody
+                    for city in cities 
+                        tr 
+                            td=city.name
+                            td 
+                                a.removeLink(href=`/cpanel/delete-city/${city.name}`) حذف
+                                span |
+                                a.updateLink(href=`/cpanel/update-city/${city.name}`) ویرایش
+        else
+            h1 هیچ شهری در پایگاه داده موجود نیست.
+            a(href="/cpanel/get-weather-data", style="width: fit-content;") دریافت اطلاعات
+        .shouldUpdateContainer
+            input#shouldUpdateChk(type="checkbox", name="shouldUpdate", checked=shouldUpdate)
+            label(for="shouldUpdate") آپدیت شهرها به صورت خودکار (هر 10 دقیقه یکبار)
+

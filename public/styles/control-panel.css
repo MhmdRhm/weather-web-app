@@ -1,0 +1,41 @@
+table {
+    border-collapse: collapse;
+    width: 50%;
+    text-align: center;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+th {
+    font-size: 20px;
+}
+
+td {
+    font-size: 18px;
+}
+
+.cpanel-container {
+    margin-top: 20px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.removeLink {
+    margin-left: 5px;
+    text-decoration: none;
+}
+
+.updateLink {
+    margin-right: 5px;
+    text-decoration: none;
+}
+
+.shouldUpdateContainer {
+    margin-top: 20px;
+}

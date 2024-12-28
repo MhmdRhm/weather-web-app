@@ -1,0 +1,22 @@
+extends default 
+block content 
+    .container
+        form#updateCityForm(method="POST", action=`/cpanel/update-city/${city.name}`)
+            div(style="display: flex;")
+                label(for="name", style="flex: 1") شهر: 
+                input(type="text", name="name",  style="flex: 5", disabled, value=city.name) 
+            div(style="display: flex; margin-top: 10px")
+                label(for="temp", style="flex: 1") دما: 
+                input(type="text", name="temp",  style="flex: 5; direction: ltr;", value=city.temp.toString())  
+            div(style="display: flex; margin-top: 10px")
+                label(for="humidity",  style="flex: 1") رطوبت: 
+                input(type="text", name="humidity",  style="flex: 5; direction: ltr;", value=city.humidity)
+            
+            div(style="display: flex; margin-top: 10px")
+                label(for="windSpeed",  style="flex: 2") سرعت وزش باد: 
+                input(type="text", name="windSpeed",  style="flex: 5; direction: ltr;", value=city.windSpeed.toString())
+            
+            div(style="display: flex; margin-top: 10px")
+                label(for="description",  style="flex: 1")  توضیحات:
+                input(type="text", name="description",  style="flex: 5", value=city.description)
+            button(type="submit", style="margin-top: 10px") ویرایش

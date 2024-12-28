@@ -1,0 +1,19 @@
+extends default 
+
+block content 
+    form(action="/login", method="POST", style="display:flex; flex-direction: column; border:1px solid black; padding: 20px 30px; margin:auto; max-width: fit-content; box-sizing: border-box;")
+        div
+            if message 
+                h4(style="text-align:center;")=message
+        div
+            label(for="username") نام کاربری:
+            input(type="text", required="true", name="username", style="width: 100%; box-sizing: border-box;")
+        div(style="margin-top: 10px;")
+            label(for="password") کلمه عبور: 
+            input(type="password", required="true", name="password", style="width: 100%; box-sizing: border-box;")
+        div(style="margin-top: 10px;")
+            button(type="submit", style="width: 100%; box-sizing: border-box;") ورود
+        div(style="margin-top: 20px; font-size:18px")
+            span حساب کاربری ندارید؟ 
+            a(href="/register") ثبت نام 
+            span کنید.

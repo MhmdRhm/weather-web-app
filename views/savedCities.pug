@@ -1,0 +1,13 @@
+extends default 
+block content
+    if cities.length < 1
+        h1(style="text-align:center;") شما هیچ شهری را ذخیره نکرده اید.
+    else
+        .contianer(style="display:flex;height:100vh;margin-top: 20px;")
+            each city in cities
+                div(style="border: 1px solid black; height: fit-content; width: fit-content;text-align:center;margin: 0 10px; padding: 0 10px")
+                    h1 
+                        a(href=`/city/${city.name}`)=city.name 
+                    h3=city.description
+                    a(style="background:none;border:0;border-top: 1px solid black;cursor:pointer;display: block; text-decoration: none", href=`/unsave/${city.name}`)
+                        span 🖤
