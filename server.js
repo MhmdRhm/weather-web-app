@@ -27,6 +27,7 @@ const MongoStore = require("connect-mongo");
 require("dotenv").config();
 
 const app = express();
+const tenMinutes = 1000 * 60 * 10;
 
 // Setting the template engine to be Pugjs
 app.set("view engine", "pug");
@@ -44,7 +45,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env["SESSION_DB"] }),
-    cookie: { maxAge: 1000 * 60 * 10 }
+    cookie: { maxAge: tenMinutes }
 }));
 
 // Custom middleware
@@ -84,6 +85,6 @@ app.get("*", notFoundHandler);
 
 mongoose.connect(process.env["APP_DB"])
     .then(() => {
-        setInterval(updateWeather, 1000);
+        setInterval(updateWeather, tenMinutes);
         app.listen(3000);
     });
